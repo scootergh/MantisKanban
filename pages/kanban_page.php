@@ -12,20 +12,21 @@
 /**
  * MantisBT Core API's
  */
-require_once( 'core.php' );
-require_once( 'compress_api.php' );
-require_once( 'filter_api.php' );
-require_once( 'last_visited_api.php' );
-require_once( 'current_user_api.php' );
-require_once( 'bug_api.php' );
-require_once( 'string_api.php' );
-require_once( 'date_api.php' );
-require_once( 'icon_api.php' );
+// require_once( 'core.php' );
+require_api( 'compress_api.php' );
+require_api( 'filter_api.php' );
+require_api( 'last_visited_api.php' );
+require_api( 'current_user_api.php' );
+require_api( 'bug_api.php' );
+require_api( 'string_api.php' );
+require_api( 'date_api.php' );
+require_api( 'icon_api.php' );
 /**
  * Plugin includes
  */
 // Projax for AJAX buttons etc.
-require_once( 'projax_api.php' );
+// require_once( 'projax_api.php' );
+require_once( 'kanban_ajax_api.php' );
 // custom Kanban functions
 require_once( 'kanban_api.php' );
 
@@ -43,13 +44,23 @@ require_once( 'kanban_api.php' );
  *	lang_get('header_column_1') => array('status' => array(10), 'wip_limit' => 0),
  * means: Column 1 of your board has the name of the key "header_column_1" (e.g. "New"),
  * shows all tickets with status = 10 and has a "work in progress" limit of 0 (unlimited).
+ *
+ * Status codes and strings:
+ * -------------------------
+ * 10: new
+ * 20: feedback
+ * 30: acknowledged
+ * 40: confirmed
+ * 50: assigned
+ * 80: resolved
+ * 90: closed
 */
 $columns = array(
 	lang_get('header_column_1') => array('status' => array(10), 'wip_limit' => 0),
-	lang_get('header_column_2') => array('status' => array(30), 'wip_limit' => 0),
-	lang_get('header_column_3') => array('status' => array(40), 'wip_limit' => 8),
-	lang_get('header_column_4') => array('status' => 20, 'wip_limit' => 0),
-	lang_get('header_column_5') => array('status' => 50, 'wip_limit' => 8),
+	lang_get('header_column_2') => array('status' => array(50), 'wip_limit' => 0),
+	lang_get('header_column_3') => array('status' => array(80), 'wip_limit' => 0),
+	lang_get('header_column_4') => array('status' => array(90), 'wip_limit' => 0),
+	// lang_get('header_column_5') => array('status' => array(20), 'wip_limit' => 0),
 	//lang_get('header_column_6') => array('status' => array(60,80,90), 'wip_limit' => 0),
 );
 
@@ -87,8 +98,8 @@ compress_enable();
 # don't index the kanban page
 html_robots_noindex();
 
-html_page_top1( plugin_lang_get( 'kanban_link' ) );
-html_page_top2();
+layout_page_header( plugin_lang_get( 'kanban_link' ) );
+layout_page_begin( plugin_page('kanban_page') );
 print_recently_visited();
 
 $f_page_number		= gpc_get_int( 'page_number', 1 );
@@ -107,8 +118,7 @@ $t_icon_path = config_get( 'icon_path' );
 ?>
 <link rel="stylesheet" type="text/css" href="<?php echo helper_mantis_url( 'plugins/MantisKanban/files/kanban.css' ); ?>"/>
 <div id="kanbanPage">
-
-<table class="hide kanbanTable" border="0" cellspacing="0" cellpadding="0" style="width: <?php echo (count($columns)*250); ?>px">
+<table class="kanbanTable" border="0" cellspacing="0" cellpadding="0" style="width: <?php echo (count($columns)*250); ?>px">
     <tr>
         <td colspan="<?php echo count($columns)-2;?>">
             <?php echo lang_get( 'sort' ); ?>
@@ -140,7 +150,7 @@ if( helper_get_current_project() == 0 ) {
 // get all user set filters
 $t_filter = current_user_get_bug_filter();
 
-// if viewing all projects, allow to switch between combined and splitted view
+// if viewing all projects, allow to switch between combined and split view
 // (all projects mixed together or separated into rows)
 $f_default_pdisplay = "combined";
 $pdisplay = gpc_get_string( 'pdisplay', $f_default_pdisplay );
@@ -174,14 +184,14 @@ foreach($all_project_ids as $curr_project_id) {
         }
         // set custom filters, partially using the global filters defined by user
         $filter_array = array(
-            'show_status' => $column['status'],
-            'sort' => $f_sort_by,
-            'dir' => 'DESC',
-            '_view_type' => 'advanced',
+            FILTER_PROPERTY_STATUS => $column['status'],
+            FILTER_PROPERTY_SORT_FIELD_NAME => $f_sort_by,
+            FILTER_PROPERTY_SORT_DIRECTION => 'DESC',
+            '_view_type' => FILTER_VIEW_TYPE_ADVANCED,
             // general filters set by user, add more if needed
-            'show_category' => $t_filter['show_category'],
-            'show_priority' => $t_filter['show_priority'],
-            'handler_id' => $t_filter['handler_id'],
+            FILTER_PROPERTY_CATEGORY_ID => $t_filter['show_category'],
+            FILTER_PROPERTY_PRIORITY => $t_filter['show_priority'],
+            FILTER_PROPERTY_HANDLER_ID => $t_filter['handler_id'],
         );
 	    $rows = filter_get_bug_rows( $f_page_number, $t_per_page, $t_page_count, $t_bug_count,
             $filter_array, $curr_project_id
@@ -307,4 +317,4 @@ foreach($all_project_ids as $curr_project_id) {
 </div>
 
 <?php
-	html_page_bottom();
+	layout_page_end();

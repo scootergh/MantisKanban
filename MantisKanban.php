@@ -7,15 +7,14 @@ class MantisKanbanPlugin extends MantisPlugin {
         $this->description  = 'Advanced Kanban board view';
         $this->page         = 'config';
 
-        $this->version = '1.2';
+        $this->version = '1.2.0';
         
         $this->requires = array(
-            'MantisCore'    => '1.2.0',
-            'jQuery'        => '1.6.2',
+            'MantisCore'    => '2.25.7',
         );
 
-        $this->author   = 'Joanna Chlasta, Stefan Moises, Joscha Krug';
-        $this->contact  = 'moises@shoptimax.de';
+        $this->author   = 'Joanna Chlasta, Stefan Moises, Joscha Krug, Garret Handel';
+        $this->contact  = 'garrethandel@gmail.com';
         $this->url      = 'https://github.com/mantisbt-plugins/MantisKanban';
     }
 
@@ -41,6 +40,7 @@ class MantisKanbanPlugin extends MantisPlugin {
     function config() {
         return array(
             'kanban_simple_columns' => ON,
+            'kanban_custom_columns' => array(),
         );
     }
 
@@ -57,15 +57,21 @@ class MantisKanbanPlugin extends MantisPlugin {
      * @return array new link for the main menu
      */
     function main_menu() {
-        return array('<a href="' . plugin_page('kanban_page') . '">' . plugin_lang_get('main_menu_kanban') . '</a>',);
+        $t_menu[] = array(
+            'title' => plugin_lang_get('main_menu_kanban'),
+            'url' => plugin_page('kanban_page'),
+            'access_level' => ANYBODY,
+            'icon' => 'fa-tasks',
+        );
+        return $t_menu;
+        // return array('<a href="' . plugin_page('kanban_page') . '">' . plugin_lang_get('main_menu_kanban') . '</a>',);
     }
 
     /**
      * Create the resource link to load the jQuery library.
      */
     function resources( $p_event ) {
-            return '<script type="text/javascript" src="' . plugin_file( 'kanban.js' ) . '"></script>'.
-                   '<script type="text/javascript">var kanbanAjaxUrl = "' . plugin_page('kanban_ajax_request') . '";</script>';
+            return '<script type="text/javascript" src="' . plugin_file( 'kanban.js' ) . '"></script>';
     }
 
 }

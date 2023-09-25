@@ -18,7 +18,7 @@ jQuery(document).ready(function(){
         
         jQuery.ajax({
             type: "POST",
-            url: kanbanAjaxUrl,
+            url: '/mantis/plugin_file.php?file=MantisKanban/kanban.js',
             data: { entrypoint: "bug_update_status",
                     id:         ticketId,
                     new_status: targetColumnId,
