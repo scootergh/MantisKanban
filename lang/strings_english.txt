@@ -28,4 +28,5 @@ $s_plugin_MantisKanban_config = 'Configuration';
 $s_plugin_MantisKanban_columns = 'Columns settings';
 $s_plugin_MantisKanban_simple_columns = 'Use default status columns';
 $s_plugin_MantisKanban_combined_columns = 'Use custom status columns.';
+$s_plugin_MantisKanban_custom_columns = 'Custom Columns';
 

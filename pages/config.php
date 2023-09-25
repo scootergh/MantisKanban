@@ -60,17 +60,46 @@ print_manage_menu( 'manage_plugin_page.php' );
 									<?php echo plugin_lang_get( 'combined_columns' )?>
 								</td>
 							</tr>
-							<!-- <tr>
+						</table>
+					</div>
+
+				</div>
+				<div class="widget-header widget-header-small">
+					<h4 class="widget-title lighter">
+						<?php
+						print_icon( 'fa-text-width', 'ace-icon' );
+						echo "&nbsp;";
+						echo plugin_lang_get( 'custom_columns');
+						?>
+					</h4>
+				</div>
+				<?php
+				$columns = plugin_config_get( 'kanban_custom_columns' );
+				
+				?>
+				<div class="widget-body">
+					<div class="widget-main no-padding table-responsive">
+						<table class="table table-bordered table-condensed table-striped">
+							<?php
+							foreach ($columns as $title => $column) {
+							?>
+							<tr>
 								<th class="category">
-									<label for="reset">
-										<?php echo plugin_lang_get( 'reset' ) ?>
+									<label for="kanban_simple_columns">
+										Issue Status: <?php echo $column['status'][0] ?>
 									</label>
 								</th>
 								<td>
-									<input type="checkbox" id="reset" name="reset" class="ace" />
-									<span class="lbl"> </span>
+									<input type="checkbox" id="reset" name="kanban_column_<?php echo $column['status'][0] ?>" class="ace" <?php echo( ON == $column['enabled'] ) ? 'checked="checked" ' : ''?>/>
+									<span class="lbl">Enable Column</span>
 								</td>
-							</tr> -->
+								<td>
+									<input type="text" name="kanban_column_<?php echo $column['status'][0] ?>_title" value="<?php echo $title ?>"/>
+								</td>
+							</tr>
+							<?php
+							}
+							?>
 						</table>
 					</div>
 
