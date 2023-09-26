@@ -54,8 +54,18 @@ class MantisKanbanPlugin extends MantisPlugin {
 		$hooks = array(
 			'EVENT_MENU_MAIN'           => 'main_menu',
 			'EVENT_LAYOUT_RESOURCES'    => 'resources',
+			'EVENT_CORE_HEADERS' => 'csp_headers',
 		);
 		return $hooks;
+	}
+
+	/**
+	 * Register gravatar url as an img-src for CSP header
+	 */
+	function csp_headers() {
+		// if( config_get( 'show_avatar' ) !== OFF ) {
+			http_csp_add( 'img-src', 'https://secure.gravatar.com/' );
+		// }
 	}
 
 	/**

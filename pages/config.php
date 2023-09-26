@@ -23,6 +23,7 @@ layout_page_begin( 'manage_overview_page.php' );
 
 print_manage_menu( 'manage_plugin_page.php' );
 
+$t_project_id = helper_get_current_project();
 ?>
 
 <div class="col-md-12 col-xs-12">
@@ -80,13 +81,18 @@ print_manage_menu( 'manage_plugin_page.php' );
 				<div class="widget-body">
 					<div class="widget-main no-padding table-responsive">
 						<table class="table table-bordered table-condensed table-striped">
+							<tr>
+								<th>Issue Status</th>
+								<th>Column Enabled</th>
+								<th>Custom Column Name</th>
+							</tr>
 							<?php
 							foreach ($columns as $title => $column) {
 							?>
 							<tr>
 								<th class="category">
 									<label for="kanban_simple_columns">
-										Issue Status: <?php echo $column['status'][0] ?>
+										Internal Status Value: <?php echo $column['status'][0] ?>
 									</label>
 								</th>
 								<td>
