@@ -9,6 +9,7 @@ jQuery(document).ready(function(){
             ui.draggable.css('left','0').css('top','0');
         }
     });
+    var kanbanAJAXURL = jQuery(".kanbanConfig").data('ajax-url');
     
     function moveColumnAjax( ticketObj,  targetColumnId )
     {
@@ -18,7 +19,7 @@ jQuery(document).ready(function(){
         
         jQuery.ajax({
             type: "POST",
-            url: '/mantis/plugin_file.php?file=MantisKanban/kanban.js',
+            url: kanbanAJAXURL,
             data: { entrypoint: "bug_update_status",
                     id:         ticketId,
                     new_status: targetColumnId,
