@@ -115,26 +115,29 @@ reset ($t_boxes);
 $t_project_id = helper_get_current_project();
 $t_icon_path = config_get( 'icon_path' );
 
+$t_versions = version_get_all_rows( $t_project_id, VERSION_ALL, true );
+
 ?>
+<span id="kanbanConfig" data-ajax-url="<?php echo plugin_page('kanban_ajax_request') ?>"></span>
 <link rel="stylesheet" type="text/css" href="<?php echo helper_mantis_url( 'plugins/MantisKanban/files/kanban.css' ); ?>"/>
 <div id="kanbanPage">
-<table class="kanbanTable" border="0" cellspacing="0" cellpadding="0" style="width: <?php echo (count($columns)*250); ?>px">
-	<tr>
-		<td colspan="<?php echo count($columns)-2;?>">
-			<?php echo lang_get( 'sort' ); ?>
-			<a href="plugin.php?page=MantisKanban/kanban_page&sort=last_updated" <?php if($f_sort_by == 'last_updated') {?> class="bold"<?php }?>>
-				<?php echo lang_get( 'sort_date_modified' );?></a> |
-			<a href="plugin.php?page=MantisKanban/kanban_page&sort=priority" <?php if($f_sort_by == 'priority') {?> class="bold"<?php }?>><?php echo lang_get( 'sort_priority_link' );?></a>
-		</td>
-		<td colspan="2" align="right">
-			<?php if( helper_get_current_project() == 0 ) { ?>
-				<?php echo lang_get( 'projectdisplay' ); ?>
-				<a href="plugin.php?page=MantisKanban/kanban_page&pdisplay=combined"><?php echo lang_get( 'project_nogroups' );?></a> |
-				<a href="plugin.php?page=MantisKanban/kanban_page&pdisplay=splitted"><?php echo lang_get( 'project_groups' );?></a>
-			<?php } ?>
-		</td>
-	</tr>
-<tr>
+	<div class="kanbanTable" border="0" cellspacing="0" cellpadding="0">
+		<div>
+			<div colspan="<?php echo count($columns)-2;?>">
+				<?php echo lang_get( 'sort' ); ?>
+				<a href="plugin.php?page=MantisKanban/kanban_page&sort=last_updated" <?php if($f_sort_by == 'last_updated') {?> class="bold"<?php }?>>
+					<?php echo lang_get( 'sort_date_modified' );?></a> |
+				<a href="plugin.php?page=MantisKanban/kanban_page&sort=priority" <?php if($f_sort_by == 'priority') {?> class="bold"<?php }?>><?php echo lang_get( 'sort_priority_link' );?></a>
+			</div>
+			<div colspan="2" align="right">
+				<?php if( helper_get_current_project() == 0 ) { ?>
+					<?php echo lang_get( 'projectdisplay' ); ?>
+					<a href="plugin.php?page=MantisKanban/kanban_page&pdisplay=combined"><?php echo lang_get( 'project_nogroups' );?></a> |
+					<a href="plugin.php?page=MantisKanban/kanban_page&pdisplay=splitted"><?php echo lang_get( 'project_groups' );?></a>
+				<?php } ?>
+			</div>
+		</div>
+		<div>
 <?php
 $t_per_page = -1;
 
@@ -165,14 +168,18 @@ $rowcounts = array();
 
 foreach($all_project_ids as $curr_project_id) {
 ?>
-	<tr>
-		<td class="projectHeader" colspan="<?php echo count($columns);?>">
+		<div class="projectHeader">
 			<h1><?php echo project_get_name($curr_project_id); ?></h1>
-		</td>
-	</tr>
-	<tr>
+		</div>
 <?php
 
+	foreach($t_versions as $version) {
+	?>
+		<div class="projectHeader">
+			<h2><?php echo $version['version']; ?></h2>
+		</div>
+		<div class="kanbanBody grid-<?php echo count($columns) ?>-col">
+	<?php
 	foreach($columns as $title => $column){
 		if($column['status'][0] > 79)
 		{
@@ -192,28 +199,29 @@ foreach($all_project_ids as $curr_project_id) {
 			FILTER_PROPERTY_CATEGORY_ID => $t_filter['show_category'],
 			FILTER_PROPERTY_PRIORITY => $t_filter['show_priority'],
 			FILTER_PROPERTY_HANDLER_ID => $t_filter['handler_id'],
+			FILTER_PROPERTY_TARGET_VERSION => $version['version'],
 		);
 		$rows = filter_get_bug_rows( $f_page_number, $t_per_page, $t_page_count, $t_bug_count,
 			$filter_array, $curr_project_id
 		);
 		$rowcounts[$title] = count($rows);
 		if(!$rows) {
-			?><td valign="top"
+			?><div valign="top"
 				<?php if( isset( $column['color'] ) ) { ?>style="border-color:<?php echo $column['color'];?>"<?php } ?>
 				id="<?php echo $column['status'][0];?>"
 				class="kanbanColumn kanbanColumn<?php echo $column['status'][0];?>">
 				<h2 <?php if( isset( $column['color'] ) ) { ?>style="background-color:<?php echo $column['color'];?>"<?php } ?>><?php echo $title;?></h2>
-			</td><?php
+			</div><?php
 			continue;
 		}
 
-		?><td valign="top"
+		?><div valign="top"
 			<?php if( isset( $column['color'] ) ) { ?>style="border-left-color:<?php echo $column['color'];?>"<?php } ?>
 			id="<?php echo $column['status'][0];?>"
 			class="<?php if($column['wip_limit'] > 0 && $rowcounts[$title] > $column['wip_limit']){ echo 'alertOff';}?> kanbanColumn kanbanColumn<?php echo $column['status'][0];?>">
 
 		<h2 <?php if( isset( $column['color'] ) ) { ?>style="background-color:<?php echo $column['color'];?>"<?php } ?>><?php
-		echo $title . ' (' . $t_bug_count .')';
+		echo $title . '<br/> (' . $t_bug_count .' Issues)';
 		if($column['wip_limit'] > 0) {
 			echo " Limit: " . $column['wip_limit'];
 		} ?>
@@ -227,8 +235,8 @@ foreach($all_project_ids as $curr_project_id) {
 				$t_bug = $row;
 				echo '<div data-userid="' . $t_current_user_id . '"  data-ticketid="' . $t_bug->id . '" data-projectid="' . $t_bug->project_id . '" class="card '. ($i%2==1 ? 'cardOdd' : 'cardEven') . ' card'. category_full_name( $t_bug->category_id, false ) .'">';
 				echo icon_get_status_icon($t_bug->priority);
-				echo '	<a href="' . string_get_bug_view_url( $t_bug->id) . '" class="bugLink">' . string_display_line_links( $t_bug->summary ) . '</a>';
-				echo '	<a href="' . string_get_bug_view_url( $t_bug->id) . '" class="bugLink right"> #'. $t_bug->id .'</a>';
+				echo '	<a href="' . string_get_bug_view_url( $t_bug->id) . '" class="bugLink" target="_blank">' . string_display_line_links( $t_bug->summary ) . '</a>';
+				echo '	<a href="' . string_get_bug_view_url( $t_bug->id) . '" class="bugLink right" target="_blank"> #'. $t_bug->id .'</a>';
 
 				$priority = get_enum_element( 'priority', $t_bug->priority );
 				/*
@@ -271,7 +279,7 @@ foreach($all_project_ids as $curr_project_id) {
 				if(( ON == config_get( 'show_assigned_names' ) ) && ( $t_bug->handler_id > 0 ) && user_exists($t_bug->handler_id) && ( access_has_project_level( config_get( 'view_handler_threshold' ), $t_bug->project_id ) ) ) {
 					$emailHash = md5( strtolower( trim( user_get_email($t_bug->handler_id) ) ) );
 					echo '<div class="owner">';
-					echo '<div class="img-wrap"><img src="http://www.gravatar.com/avatar/'. $emailHash .'?s=28&d=monsterid" width="28" height="28" /></div>';
+					echo '<div class="img-wrap"><img src="https://secure.gravatar.com/avatar/'. $emailHash .'?s=28&d=monsterid" width="28" height="28" /></div>';
 
 					echo user_get_realname( $t_bug->handler_id );
 					echo '</div>';
@@ -282,38 +290,41 @@ foreach($all_project_ids as $curr_project_id) {
 			}
 		}
 	}
-
-	?></td><?php
-	}
-
-?>
-		</td>
-	</tr>
-	<tr>
-<?php
-}
-?>
-</tr>
-<tr class="totalNums">
-	<?php
-	foreach($columns as $title => $column){
 	?>
-	<td align="center" class="totalSum">
-		<h2><?php echo $title; ?></h2>
-		<div class="<?php if($column['wip_limit'] > 0 && $rowcounts[$title] > $column['wip_limit']) {echo 'alert';}?>">
-		<?php
-		echo $rowcounts[$title];
-		if($column['wip_limit'] > 0 && $rowcounts[$title] > $column['wip_limit']) {
-			echo " (Limit: " . $column['wip_limit'] . ")";
-		}
-		?>
+	</div>
+	<?php
+	} // end columns loop
+	?>
+	</div>
+	<?php
+	} // end versions loop
+	?>
 		</div>
-	</td>
-	<?php
-	}
-	?>
-</tr>
-</table>
+		<div>
+<?php
+} // end projects loop
+?>
+		</div>
+		<div class="totalNums">
+			<?php
+			foreach($columns as $title => $column){
+			?>
+			<div align="center" class="totalSum">
+				<h2><?php echo $title; ?></h2>
+				<div class="<?php if($column['wip_limit'] > 0 && $rowcounts[$title] > $column['wip_limit']) {echo 'alert';}?>">
+				<?php
+				echo $rowcounts[$title];
+				if($column['wip_limit'] > 0 && $rowcounts[$title] > $column['wip_limit']) {
+					echo " (Limit: " . $column['wip_limit'] . ")";
+				}
+				?>
+				</div>
+			</div>
+			<?php
+			}
+			?>
+		</div>
+	</div>
 </div>
 
 <?php

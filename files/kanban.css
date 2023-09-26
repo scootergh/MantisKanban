@@ -1,13 +1,40 @@
-table.kanbanTable {
-		
+.kanbanTable {
+	display: flex;
+	flex-direction: column;
 }
-table.kanbanTable tr {
+.kanbanBody {
+	display: flex;
+}
+.grid-4-col {
+	display: grid;
+	grid: auto / 25% 25% 25% 25%;
+	grid-gap: 10px;
+}
+.grid-5-col {
+	display: grid;
+	grid: auto / 20% 20% 20% 20% 20%;
+	grid-gap: 10px;
+}
+.grid-6-col {
+	display: grid;
+	grid: auto / 16% 16% 16% 16% 16% 16%;
+	grid-gap: 10px;
+}
+.grid-7-col {
+	display: grid;
+	grid: auto / 14% 14% 14% 14% 14% 14% 14%;
+	grid-gap: 10px;
+}
+.kanbanTable tr {
 	vertical-align: top;
 }
-table.kanbanTable tr td {
+.kanbanTable tr td {
 	width: 250px;
     padding: 0 10px 0 0;
     border-left:solid 2px white;
+}
+.kanbanColumn {
+	min-width: 250px;
 }
 
 
@@ -144,10 +171,10 @@ div.card div.priority span.status_90
     color: green;
 }
 
-td.alert {
+.alert {
     background-color: red;
 }
-td.projectHeader {
+.projectHeader {
     background-color: #ddd;
     padding: 5px;
     margin: 5px;
@@ -156,17 +183,17 @@ div.headerProject {
     font-weight: bold;
     color: #ABABAB;
 }
-td.totalSum {
+.totalSum {
     font-weight: bold;
     text-align: center;
 }
-td.totalSum div{
+.totalSum div{
     color: green;
 }
-td.totalSum div.alert{
+.totalSum div.alert{
     color: red;
 }
-tr.totalNums td {
+.totalNums td {
     background-color: silver;
 }
 
