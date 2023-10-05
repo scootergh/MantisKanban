@@ -17,45 +17,142 @@
 auth_reauthenticate( );
 access_ensure_global_level( config_get( 'manage_plugin_threshold' ) );
 
-html_page_top( lang_get( 'plugin_format_title' ) );
+layout_page_header( plugin_lang_get( 'title') . ': ' . plugin_lang_get( 'config' ) );
 
-print_manage_menu( );
+layout_page_begin( 'manage_overview_page.php' );
+
+print_manage_menu( 'manage_plugin_page.php' );
+
+$t_project_id = helper_get_current_project();
+
+$tags = tag_get_candidates_for_bug(0);
 
 ?>
 
-<br />
-<form action="<?php echo plugin_page( 'config_edit' )?>" method="post">
-<?php echo form_security_field( 'plugin_kanban_config_edit' ) ?>
-<table align="center" class="width50" cellspacing="1">
+<div class="col-md-12 col-xs-12">
+	<div class="space-10"></div>
+	<div class="form-container">
+		<form action="<?php echo plugin_page( 'config_edit' )?>" method="post">
+			<?php echo form_security_field( 'plugin_kanban_config_edit' ) ?>
+			<div class="widget-box widget-color-blue2">
+				<div class="widget-header widget-header-small">
+					<h4 class="widget-title lighter">
+						<?php
+						print_icon( 'fa-text-width', 'ace-icon' );
+						echo "&nbsp;";
+						echo plugin_lang_get( 'title') . ': '
+							. plugin_lang_get( 'config' );
+						?>
+					</h4>
+				</div>
 
-<tr>
-	<td class="form-title" colspan="3">
-		<?php echo lang_get( 'plugin_kanban_title' ) . ': ' . lang_get( 'plugin_kanban_config' )?>
-	</td>
-</tr>
+				<div class="widget-body">
+					<div class="widget-main no-padding table-responsive">
+						<table class="table table-bordered table-condensed table-striped">
+							<tr>
+								<th class="category">
+									<label for="kanban_simple_columns">
+										<?php echo plugin_lang_get( 'columns' ) ?>
+									</label>
+								</th>
+								<td>
+									<input type="radio" name="kanban_simple_columns" value="1" <?php echo( ON == plugin_config_get( 'kanban_simple_columns' ) ) ? 'checked="checked" ' : ''?>/>
+									<?php echo plugin_lang_get( 'simple_columns' )?>
+								</td>
+								<td>
+									<input type="radio" name="kanban_simple_columns" value="0" <?php echo( OFF == plugin_config_get( 'kanban_simple_columns' ) ) ? 'checked="checked" ' : ''?>/>
+									<?php echo plugin_lang_get( 'combined_columns' )?>
+								</td>
+							</tr>
+							<tr>
+								<th class="category">
+									<label for="kanban_api_token">
+										<?php echo plugin_lang_get('api_token') ?>
+									</label>
+								</th>
+								<td>
+									<input type="text" name="kanban_api_token" value="<?php echo plugin_config_get('kanban_api_token') ?>" style="width:300px;">
+								</td>
+							</tr>
+						</table>
+					</div>
 
-<tr <?php echo helper_alternate_class( )?>>
-	<td class="category" width="60%">
-		<?php echo lang_get( 'plugin_kanban_columns' )?>
-	</td>
-	<td class="center" width="20%">
-		<label><input type="radio" name="kanban_simple_columns" value="1" <?php echo( ON == plugin_config_get( 'kanban_simple_columns' ) ) ? 'checked="checked" ' : ''?>/>
-			<?php echo lang_get( 'plugin_kanban_simple_columns' )?></label>
-	</td>
-	<td class="center" width="20%">
-		<label><input type="radio" name="kanban_simple_columns" value="0" <?php echo( OFF == plugin_config_get( 'kanban_simple_columns' ) ) ? 'checked="checked" ' : ''?>/>
-			<?php echo lang_get( 'plugin_kanban_combined_columns' )?></label>
-	</td>
-</tr>
+				</div>
+				<div class="widget-header widget-header-small">
+					<h4 class="widget-title lighter">
+						<?php
+						print_icon( 'fa-text-width', 'ace-icon' );
+						echo "&nbsp;";
+						echo plugin_lang_get( 'custom_columns');
+						?>
+					</h4>
+				</div>
+				<?php
+				$columns = plugin_config_get( 'kanban_custom_columns' );
 
-<tr>
-	<td class="center" colspan="3">
-		<input type="submit" class="button" value="<?php echo lang_get( 'change_configuration' )?>" />
-	</td>
-</tr>
+				?>
+				<div class="widget-body">
+					<div class="widget-main no-padding table-responsive">
+						<table class="table table-bordered table-condensed table-striped">
+							<tr>
+								<th>Issue Tag</th>
+								<th>Column Enabled</th>
+								<th>Custom Column Name</th>
+							</tr>
+							<?php
+							$column_count = 0;
+							foreach ($columns as $column) {
+							?>
+							<tr>
+								<th class="category">
+									<label for="kanban_custom_columns">
+										<select name="kanban_column_tag_<?php echo $column_count ?>">
+										<?php
+										$t_rows = tag_get_candidates_for_bug( 0 );
 
-</table>
-</form>
+										$none_selected = true;
+										foreach ($t_rows as $t_row) {
+											if ($column['tag'] == $t_row['id']) {
+												echo '<option value="0">', $t_row['name'], '</option>';
+												$none_selected = false;
+											}
+										}
+										if ($none_selected) {
+											echo '<option value="0"></option>';
+										}
+										foreach ( $t_rows as $t_row ) {
+											echo '<option value="', $t_row['id'], '" title="', string_attribute( $t_row['description'] );
+											echo '"'. ($column['tag'] == $t_row['id'] ? 'selected' : '') .'>', string_attribute( $t_row['name'] ), '</option>';
+										}
+										?>
+										</select>
+									</label>
+								</th>
+								<td>
+									<input type="checkbox" name="kanban_column_enabled_<?php echo $column_count ?>" class="ace" <?php echo( ON == $column['enabled'] ) ? 'checked="checked" ' : ''?>/>
+									<span class="lbl">Enable Column</span>
+								</td>
+								<td>
+									<input type="text" name="kanban_column_title_<?php echo $column_count ?>" value="<?php echo $column['title'] ?>"/>
+								</td>
+							</tr>
+							<?php
+							$column_count++;
+							}
+							?>
+						</table>
+					</div>
+
+					<div class="widget-toolbox padding-8 clearfix">
+						<button class="btn btn-primary btn-white btn-round">
+							<?php echo lang_get( 'change_configuration' )?>
+						</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
 
 <?php
-html_page_bottom();
+layout_page_end();

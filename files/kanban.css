@@ -1,27 +1,60 @@
-table.kanbanTable {
-		
+#kanbanPage {
+	margin-top: 20px;
 }
-table.kanbanTable tr {
-	vertical-align: top;
+#kanbanTableSidebar {
+	width: 125px;
 }
-table.kanbanTable tr td {
-	width: 250px;
-    padding: 0 10px 0 0;
-    border-left:solid 2px white;
+#kanbanTableSidebar a {
+	cursor: pointer;
+}
+#kanbanTable {
+	display: flex;
+	flex-direction: column;
+	padding: 0 10px;
+}
+.kanbanBody {
+	display: flex;
+	margin-bottom: 20px;
+	min-height: 150px;
+	justify-content: space-between;
+}
+.kanbanBody:last-of-type {
+	margin-bottom: 0;
+}
+.grid-4-col .kanbanColumn {
+	flex-basis: calc(25% - 10px);
+}
+.grid-5-col .kanbanColumn {
+	flex-basis: calc(20% - 10px);
+}
+.grid-6-col .kanbanColumn {
+	flex-basis: calc(16% - 10px);
+}
+.grid-7-col .kanbanColumn {
+	flex-basis: calc(14% - 10px);
+}
+.kanbanColumn {
+	min-width: 250px;
 }
 
 
 #kanbanPage h1 {
-	font: bold 23px Arial, serif;
-	line-height: 27px;
+	font: bold 34px Arial, serif;
+/*	line-height: 27px;*/
 	text-align: center;
     margin: 0;
 }
 
 #kanbanPage h2 {
-	font: bold 14px Arial, serif;
-	line-height: 18px;
+	font: bold 26px Arial, serif;
+/*	line-height: 18px;*/
+	text-align: center;
+}
+
+#kanbanPage h3 {
+	font: bold 18px Arial, serif;
 	margin: 0 0 18px 0;
+	padding: 4px 0;
 	text-align: center;
 }
 
@@ -31,15 +64,20 @@ a.bold, a:active.bold, a:visited.bold, a:hover.bold {
 
 div.card {
 	background: #f6f6f6;
-	border-left: 3px solid #999;
+	border-top: 20px solid #999;
+	border-radius: 5px;
+	padding: 10px;
 	clear:left;
 	float:left;
 	font: 10px Tahoma, Arial, sans-serif;
 	margin: 0 5% 9px 5px;
-	padding: 0;
-	line-height: 13px;
+		line-height: 13px;
 	width: 95%;
     box-shadow: 3px 3px 5px rgba(0,0,0,0.5);
+}
+
+div.card:last-of-type {
+	margin-bottom: 30px;
 }
 
 div.card a {
@@ -144,29 +182,32 @@ div.card div.priority span.status_90
     color: green;
 }
 
-td.alert {
+.alert {
     background-color: red;
 }
-td.projectHeader {
-    background-color: #ddd;
+.header {
     padding: 5px;
-    margin: 5px;
-}
-div.headerProject {
+    margin: 10px auto;
     font-weight: bold;
-    color: #ABABAB;
 }
-td.totalSum {
+.projectHeader {
+    background-color: #F1FCA0;
+	padding: 20px 0;
+}
+.boardHeader {
+	background-color: #EDD6F1;
+}
+.totalSum {
     font-weight: bold;
     text-align: center;
 }
-td.totalSum div{
+.totalSum div{
     color: green;
 }
-td.totalSum div.alert{
+.totalSum div.alert{
     color: red;
 }
-tr.totalNums td {
+.totalNums td {
     background-color: silver;
 }
 

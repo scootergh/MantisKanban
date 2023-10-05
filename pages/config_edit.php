@@ -25,6 +25,23 @@ if( plugin_config_get( 'kanban_simple_columns' ) != $kanban_simple_columns ) {
 	plugin_config_set( 'kanban_simple_columns', $kanban_simple_columns );
 }
 
-form_security_purge( 'plugin_kanban_config_edit' );
+$columns = plugin_config_get( 'kanban_custom_columns' );
+$i = 0;
+foreach ($columns as $column) {
+	echo "Current: ". $i;
+	$columns[$i]['tag'] = gpc_get_string('kanban_column_tag_'.$i);
+	$columns[$i]['enabled'] = gpc_get_bool('kanban_column_enabled_'.$i);
+	$columns[$i]['title'] = gpc_get_string('kanban_column_title_'.$i);
+	$i++;
+}
 
+plugin_config_set('kanban_custom_columns', $columns);
+
+
+$kanban_api_token = gpc_get_string('kanban_api_token');
+if (plugin_config_get('kanban_api_token') != $kanban_api_token) {
+	plugin_config_set('kanban_api_token');
+}
+
+form_security_purge( 'plugin_kanban_config_edit' );
 print_successful_redirect( plugin_page( 'config', true ) );
